@@ -1,0 +1,27 @@
+PODS:
+  - FBSnapshotTestCase (2.1.4):
+    - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
+  - FBSnapshotTestCase/Core (2.1.4)
+  - FBSnapshotTestCase/SwiftSupport (2.1.4):
+    - FBSnapshotTestCase/Core
+  - SFExtension (0.1.0)
+
+DEPENDENCIES:
+  - FBSnapshotTestCase (~> 2.1.4)
+  - SFExtension (from `~/Desktop/GitHub/SFTeammate/Basic/SFExtension/`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - FBSnapshotTestCase
+
+EXTERNAL SOURCES:
+  SFExtension:
+    :path: "~/Desktop/GitHub/SFTeammate/Basic/SFExtension/"
+
+SPEC CHECKSUMS:
+  FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
+  SFExtension: db5d207c8b9cb15d09d28858aec071d51050f3c5
+
+PODFILE CHECKSUM: d9c10e6ab0125283b50f39df8052d554b2ad27ee
+
+COCOAPODS: 1.12.1

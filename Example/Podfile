@@ -1,0 +1,142 @@
+source 'https://github.com/CocoaPods/Specs.git'
+
+# 平台
+platform :ios, '12.0'
+# 使用frameworks
+use_frameworks!
+# 忽略pod里面警告
+inhibit_all_warnings!
+
+# ****** 依～赖 ****** #
+# ------ 私有库 ------ #
+def private_pods
+  $path = '~/Documents/GitHub/SFTeammate/'
+  $branch = 'main'
+  $tag = '0.1.0'
+  $level_basic = 'Basic'
+  $level_public = 'Public'
+  $level_server = 'Server'
+
+  # 基础层
+  pod 'SFExtension'             , :path => $path + $level_basic + '/SFExtension/'            #, :branch => $branch   , :tag => $tag
+  
+  # 公共层
+  
+  # 服务层
+
+end
+
+# ------ 三方库 ------ #
+def third_pods
+
+end
+
+
+# ------ TARGET ------ #
+target 'SFExtension_Example' do
+  private_pods
+  third_pods
+  
+  target 'SFExtension_Tests' do
+    inherit! :search_paths
+
+    pod 'FBSnapshotTestCase' , '~> 2.1.4'
+  end
+  
+end
+
+
+# ------ CONFIG ------ #
+# 公共设定
+def set_pod_com(config)
+  config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+  config.build_settings['SWIFT_VERSION'] = '5.0'
+  config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+  config.build_settings['ONLY_ACTIVE_ARCH'] = 'false'
+  config.build_settings['ENABLE_BITCODE'] = 'YES'
+end
+
+
+# 定义代码优化级别
+def set_pod_optimization_level(config)
+  if config.name == "DEV" || config.name == "PPE"
+    config.build_settings['GCC_OPTIMIZATION_LEVEL'] = '0'
+    config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
+  else
+    config.build_settings['GCC_OPTIMIZATION_LEVEL'] = 's'
+    config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-O'
+  end
+end
+
+
+# 定义环境宏定义
+def set_pod_env_macros(config)
+  if config.name == "DEV"
+    config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'DEV=1', 'DEBUG=1']
+    config.build_settings['SWIFT_ACTIVE_COMPILATION_CONDITIONS'] = ['$(inherited)', 'DEV', 'DEBUG']
+    #config.build_settings['OTHER_SWIFT_FLAGS'] = ['$(inherited)', '-DDEBUG'] # 废弃, 使用 SWIFT_ACTIVE_COMPILATION_CONDITIONS 替代
+  elsif config.name == "SIT"
+    config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'SIT=1', 'RELEASE=1']
+    config.build_settings['SWIFT_ACTIVE_COMPILATION_CONDITIONS'] = ['$(inherited)', 'SIT', 'RELEASE']
+  elsif config.name == "PPE"
+    config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'PPE=1', 'DEBUG=1']
+    config.build_settings['SWIFT_ACTIVE_COMPILATION_CONDITIONS'] = ['$(inherited)', 'PPE', 'DEBUG']
+  elsif config.name == "PRD"
+    config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'PRD=1', 'RELEASE=1']
+    config.build_settings['SWIFT_ACTIVE_COMPILATION_CONDITIONS'] = ['$(inherited)', 'PRD', 'RELEASE']
+  end
+end
+
+
+# installer
+post_install do |installer|
+  # 获取主工程的team id
+  dev_team = ""
+  project = installer.aggregate_targets[0].user_project
+  project.targets.each do |target|
+    target.build_configurations.each do |config|
+      if dev_team.empty? and !config.build_settings['DEVELOPMENT_TEAM'].nil?
+        dev_team = config.build_settings['DEVELOPMENT_TEAM']
+      end
+    end
+  end
+  
+  # 遍历所有pod项目
+  installer.pods_project.targets.each do |target|
+    # config
+    target.build_configurations.each do |config|
+      set_pod_com(config)
+      set_pod_optimization_level(config)
+      set_pod_env_macros(config)
+    end
+    
+    # 签名
+    if target.respond_to?(:product_type) and target.product_type == "com.apple.product-type.bundle"
+      target.build_configurations.each do |config|
+        config.build_settings['DEVELOPMENT_TEAM'] = dev_team
+      end
+    end
+    
+  end
+  
+  # 解决Xcode更新到15.0 (15A240d)以后，build失败的问题
+  # Xcode 运行报错：DT_TOOLCHAIN_DIR cannot be used to evaluate LIBRARY_SEARCH_PATHS, use TOOLCHAIN_DIR instead
+  installer.aggregate_targets.each do |target|
+    target.xcconfigs.each do |variant, xcconfig|
+      xcconfig_path = target.client_root + target.xcconfig_relative_path(variant)
+      IO.write(xcconfig_path, IO.read(xcconfig_path).gsub("DT_TOOLCHAIN_DIR", "TOOLCHAIN_DIR"))
+    end
+  end
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      if config.base_configuration_reference.is_a? Xcodeproj::Project::Object::PBXFileReference
+        xcconfig_path = config.base_configuration_reference.real_path
+        IO.write(xcconfig_path, IO.read(xcconfig_path).gsub("DT_TOOLCHAIN_DIR", "TOOLCHAIN_DIR"))
+      end
+    end
+  end
+  
+end
+
+
+

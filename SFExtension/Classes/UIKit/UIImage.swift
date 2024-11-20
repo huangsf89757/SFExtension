@@ -8,6 +8,23 @@
 import Foundation
 import UIKit
 
+// MARK: - ImageCache
+class ImageCache {
+    static let shared = NSCache<NSString, UIImage>()
+    
+    static func image(name: String, bundle: Bundle? = nil, traitCollection: UITraitCollection? = nil) -> UIImage? {
+        let cacheKey = "\(bundle?.bundleIdentifier ?? "main").\(name)" as NSString
+        if let cachedImage = shared.object(forKey: cacheKey) {
+            return cachedImage
+        }
+        let image = UIImage(named: name, in: bundle, compatibleWith: traitCollection)
+        if let image = image {
+            shared.setObject(image, forKey: cacheKey)
+        }
+        return image
+    }
+}
+
 // MARK: - init
 public extension SFWrapper where Base: UIImage {
     /// 创建
@@ -16,10 +33,10 @@ public extension SFWrapper where Base: UIImage {
     ///   - cls: 所在类名，nil则为默认的main bundle
     ///   - resource: 所在库的资源文件，nil则为默认的库名
     /// - Returns: image
-    static func image(name: String?, cls: AnyClass?, resource: String? = nil) -> UIImage? {
+    static func image(name: String?, cls: AnyClass?, resource: String? = nil, traitCollection: UITraitCollection? = nil) -> UIImage? {
         guard let name = name else { return nil }
         if let cls = cls {
-            return image(name: name, bundle: Bundle.sf.bundle(cls: cls, resource: resource))
+            return image(name: name, bundle: Bundle.sf.bundle(cls: cls, resource: resource), traitCollection: traitCollection)
         }
         return image(name: name, bundle: Bundle.main)
     }
@@ -29,9 +46,9 @@ public extension SFWrapper where Base: UIImage {
     ///   - name: 图片名称
     ///   - bundle: 所在bundle
     /// - Returns: image
-    static func image(name: String?, bundle: Bundle? = Bundle.main) -> UIImage? {
+    static func image(name: String?, bundle: Bundle? = Bundle.main, traitCollection: UITraitCollection? = nil) -> UIImage? {
         guard let name = name else { return nil }
-        return UIImage(named: name, in: bundle, compatibleWith: nil)
+        return ImageCache.image(name: name, bundle: bundle, traitCollection: traitCollection)
     }
     
     /// 创建

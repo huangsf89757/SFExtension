@@ -29,7 +29,7 @@
 
 /* Begin PBXFileReference section */
 		2E5EEE4F0306D134E2B81BAC /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
-		337A4599D0866714471279DA /* SFExtension.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = SFExtension.podspec; path = ../SFExtension.podspec; sourceTree = "<group>"; };
+		337A4599D0866714471279DA /* SFExtension.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = SFExtension.podspec; path = ../SFExtension.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		3712F6102DE708A4B7A96A3C /* Pods-SFExtension_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SFExtension_Tests.release.xcconfig"; path = "Target Support Files/Pods-SFExtension_Tests/Pods-SFExtension_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		5A37328E3DE89ADD869E3CFB /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* SFExtension_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SFExtension_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };

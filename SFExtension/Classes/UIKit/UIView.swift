@@ -51,7 +51,8 @@ public extension UIView {
     }
 }
 public extension SFWrapper where Base: UIView {
-    func setCornerAndShadow(radius: CGFloat, 
+    func setCornerAndShadow(radius: CGFloat,
+                            maskedCorners: CACornerMask = [.layerMinXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMinYCorner, .layerMaxXMaxYCorner],
                             fillColor: UIColor? = .white,
                             shadowColor: UIColor? = .black,
                             shadowOpacity: Float = 0.3,
@@ -60,6 +61,7 @@ public extension SFWrapper where Base: UIView {
         base.shouldUpdateShadowLayer = true
         base.backgroundColor = .clear
         base.layer.cornerRadius = radius
+        base.layer.maskedCorners = maskedCorners
         base.layer.masksToBounds = false
         base.clipsToBounds = false
         

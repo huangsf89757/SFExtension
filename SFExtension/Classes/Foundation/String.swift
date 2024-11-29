@@ -42,20 +42,6 @@ public extension SFWrapper where Base == String {
 }
 
 public extension SFWrapper where Base == String {
-    /// 重复自己n次
-    func repect(_ count: Int) -> String {
-        var str = ""
-        for _ in 0..<count {
-            str.append(base)
-        }
-        return str
-    }
-    
-    /// 添加
-    func append(_ str: String, repect count: Int) -> String? {
-        let appendStr = str.sf.repect(count)
-        return base.appending(appendStr)
-    }
     
     /// Bool value from string (if applicable).
     ///
@@ -122,4 +108,181 @@ public extension SFWrapper where Base == String {
     }
 }
 
+public extension SFWrapper where Base == String {
+    /// 将任一字符串转换为英文字母字符串
+    public var pinyin: String {
+        let mutableString = NSMutableString(string: base)
+        
+        // 应用 kCFStringTransformToLatin 变换将所有非英文文本转换为拉丁字母表示, 小写不带音标。
+        CFStringTransform(mutableString, nil, "Any-Latin; Latin-ASCII; Any-Lower" as CFString, false)
+        
+        // 分词去掉空格
+        let tokenizer = CFStringTokenizerCreate(nil, mutableString, CFRangeMake(0, CFStringGetLength(mutableString)), 0, CFLocaleCopyCurrent())
+        var mutableTokens: [String] = []
+        var type: CFStringTokenizerTokenType
+        repeat {
+            type = CFStringTokenizerAdvanceToNextToken(tokenizer)
+            let range = CFStringTokenizerGetCurrentTokenRange(tokenizer)
+            let token = CFStringCreateWithSubstring(nil, mutableString, range) as NSString
+            mutableTokens.append(token as String)
+        } while type != []
+        //生成最终字符串
+        let joined = mutableTokens.joined()
+        return joined.replacingOccurrences(of: "'", with: "")
+    }
+}
 
+
+/**
+ * Regex（custom）
+ * - ✅ 手机号
+ * - ✅ 邮箱号
+ * - ✅ 验证码（可设置位数）
+ * - ✅ 数字（可设置位数范围）
+ * - ✅ 金额（可设置小数位数）
+ * - ✅ 中文
+ * - ✅ 自定义正则表达式
+ */
+public enum SFRegexType {
+    // 手机号
+    case phone
+    // 邮箱号
+    case email
+    // 验证码（位数）
+    case code(Int)
+    // 数字（位数范围）
+    case number(Int, Int)
+    // 金额（最多小数位数）
+    case money(Int)
+    // 中文
+    case chinese
+    // 密码格式必须包含大小写字母和数字的组合，长度在8-16之间，不能使用特殊字符
+    case password
+    // 自定义（正则表达式）
+    case custom(String)
+    
+    public func pattern() -> String {
+        var pattern = ""
+        switch self {
+        case .phone:
+            pattern = "^\\d{11}$"
+        case .email:
+            pattern = "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"
+        case let .code(num):
+            pattern = "^\\d{\(num)}$"
+        case let .number(min, max):
+            pattern = "^\\d{\(min),\(max)}$"
+        case let .money(num):
+            pattern = "(^[1-9]([0-9]+)?(\\.[0-9]{1,\(num)})?$)|(^[0-9](\\.[0-9]{1,\(num)})?$)"
+        case .chinese:
+            pattern = "^[^\\u4e00-\\u9fa5]{0,}$"
+        case .password:
+            pattern = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]{8,16}$"
+        case let .custom(str):
+            pattern = str
+        }
+        return pattern
+    }
+}
+
+/**
+ * Regex（custom）
+ * - ✅ 正则匹配是否成功
+ * - ✅ 正则匹配提取
+ * - ✅ 正则替换
+ */
+public extension SFWrapper where Base == String  {
+    
+    /// 正则匹配是否成功
+    /// - Parameter type: 类型
+    /// - Returns: 是否匹配
+    func isRegex(type: SFRegexType) -> Bool  {
+        return isRegex(type.pattern())
+    }
+    
+    /// 正则匹配提取
+    /// - Parameter type: 类型
+    /// - Returns: 匹配的结果
+    func regex(type: SFRegexType) -> [String] {
+        return regex(type.pattern())
+    }
+    
+    /// 正则替换
+    /// - Parameters:
+    ///   - type: 类型
+    ///   - replace: 替换的字符
+    /// - Returns: 替换的结果
+    func regex(type: SFRegexType, replace: String) -> String {
+        return regex(type.pattern(), replace: replace)
+    }
+
+}
+
+/**
+ * Regex
+ * - ✅ 正则匹配
+ * - ✅ 正则替换
+ */
+public extension SFWrapper where Base == String {
+    
+    /// 正则匹配是否成功
+    /// - Parameter pattern: 正则表达式
+    /// - Returns: 是否匹配
+    func isRegex(_ pattern: String) -> Bool  {
+        return regex(pattern).count > 0
+    }
+        
+    /// 正则匹配
+    /// - Parameter pattern: 正则表达式
+    /// - Returns: 匹配的结果
+    func regex(_ pattern: String) -> [String] {
+        do {
+            let regex = try NSRegularExpression(pattern: pattern, options: [])
+            let matches = regex.matches(in: base, options: [], range: NSMakeRange(0, base.count))
+            var data: [String] = []
+            for item in matches {
+                let string = (base as NSString).substring(with: item.range)
+                data.append(string)
+            }
+            return data
+        }
+        catch {
+            return []
+        }
+    }
+    
+    /// 正则替换
+    /// - Parameters:
+    ///   - pattern: 正则表达式
+    ///   - replace: 替换的字符
+    /// - Returns: 替换后的结果
+    func regex(_ pattern: String, replace: String) -> String {
+        do {
+            let regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+            let modified = regex.stringByReplacingMatches(in: base, options: .reportProgress, range: NSRange(location: 0, length: base.count), withTemplate: replace)
+            return modified
+        }
+        catch {
+            return base
+        }
+    }
+}
+
+public extension SFWrapper where Base == String {
+    /// 转换成密文
+    public var secret: String {
+        if base.sf.isRegex(type: .phone) {
+            return base.sf.regex("(\\d{3})(\\d{4})(\\d{4})", replace: "$1****$3")
+        }
+        else if base.sf.isRegex(type: .email) {
+            let components = base.components(separatedBy: "@")
+            if components.count == 2 {
+                let username = components[0]
+                let domain = components[1]
+                let processedUsername = String(username.prefix(1)) + "***"
+                return "\(processedUsername)@\(domain)"
+            }
+        }
+        return base
+    }
+}

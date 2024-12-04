@@ -108,6 +108,7 @@ public extension SFWrapper where Base == String {
     }
 }
 
+// MARK: - Pinyin
 public extension SFWrapper where Base == String {
     /// 将任一字符串转换为英文字母字符串
     public var pinyin: String {
@@ -132,7 +133,7 @@ public extension SFWrapper where Base == String {
     }
 }
 
-
+// MARK: - Regex
 /**
  * Regex（custom）
  * - ✅ 手机号
@@ -284,5 +285,20 @@ public extension SFWrapper where Base == String {
             }
         }
         return base
+    }
+}
+
+// MARK: - Crypto
+import CryptoKit
+
+extension String {
+    public static var salt = "AsfhikHIHIu9887THoi0HLKMLihuHG067865"
+}
+extension SFWrapper where Base == String {
+    public func sha256(salt: String? = nil) -> String? {
+        let value = base + (salt ?? String.salt)
+        guard let data = value.data(using: .utf8) else { return nil }
+        let hash = SHA256.hash(data: data)
+        return hash.compactMap { String(format: "%02x", $0) }.joined()
     }
 }

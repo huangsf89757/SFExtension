@@ -9,26 +9,26 @@ import Foundation
 
 
 // MARK: - string
-public extension SFWrapper where Base == String {
+extension SFWrapper where Base == String {
     
     /// 截取字符串
     /// - Parameter start: 起始索引（包含）
     /// - Parameter end: 结束索引（不包含）
-    func substring(start: Int, end: Int) -> String {
+    public func substring(start: Int, end: Int) -> String {
         let startIndex = base.index(base.startIndex, offsetBy: max(0, min(start, base.count)))
         let endIndex = base.index(base.startIndex, offsetBy: max(0, min(end, base.count)))
         return String(base[startIndex..<endIndex])
     }
     
     /// 是否为UUID字符串
-    func isUUID() -> Bool {
+    public func isUUID() -> Bool {
         let uuidRegex = try? NSRegularExpression(pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", options: .caseInsensitive)
         let range = NSRange(location: 0, length: base.utf16.count)
         return uuidRegex?.firstMatch(in: base, options: [], range: range) != nil
     }
     
     /// 16进制字符串（可以有空格）转换成二进制数据
-    func toData() -> Data {
+    public func toData() -> Data {
         let hex = base.replacingOccurrences(of: " ", with: "")
         var byteArray = [UInt8]()
         for i in stride(from: 0, to: hex.count, by: 2) {
@@ -38,6 +38,25 @@ public extension SFWrapper where Base == String {
             }
         }
         return Data(byteArray)
+    }
+    
+    /// 阅读耗时
+    public var readingTime: Int {
+        let language = Locale.current.languageCode ?? "en"
+        let readingSpeed: Double
+        switch language {
+        case "zh": // 中文
+            readingSpeed = 350.0
+        case "ja": // 日文
+            readingSpeed = 300.0
+        case "ko": // 韩文
+            readingSpeed = 320.0
+        default: // 英文及其他语言
+            readingSpeed = 225.0
+        }
+        let textLength = base.count
+        let totalSeconds = Int((Double(textLength) / readingSpeed) * 60)
+        return totalSeconds
     }
 }
 

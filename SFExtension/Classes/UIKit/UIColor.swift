@@ -51,6 +51,51 @@ public extension SFWrapper where Base: UIColor {
         let blue = CGFloat(rgb & 0x0000FF) / 255.0
         return UIColor(red: red, green: green, blue: blue, alpha: alpha)
     }
+    
+    /// 获取 UIColor 的十六进制整数表示
+    /// - Parameter includeAlpha: 是否包含透明度
+    /// - Returns: 表示颜色的十六进制整数（如 0xRRGGBB 或 0xRRGGBBAA）
+    func toHexInt(includeAlpha: Bool = false) -> Int? {
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        
+        // 获取颜色的 RGBA 值
+        guard base.getRed(&r, green: &g, blue: &b, alpha: &a) else { return nil }
+        
+        // 四舍五入避免浮点精度问题
+        let intR = Int(round(r * 255))
+        let intG = Int(round(g * 255))
+        let intB = Int(round(b * 255))
+        let intA = Int(round(a * 255))
+        
+        if includeAlpha {
+            // 如果完全透明，直接返回 0
+            if intA == 0 {
+                return 0x00000000
+            }
+            return (intA << 24) | (intR << 16) | (intG << 8) | intB
+        } else {
+            return (intR << 16) | (intG << 8) | intB
+        }
+    }
+
+    
+    /// 获取 UIColor 的十六进制字符串表示
+    /// - Parameter includeAlpha: 是否包含透明度
+    /// - Returns: 颜色的十六进制字符串（如 #RRGGBB 或 #RRGGBBAA）
+    func toHexString(includeAlpha: Bool = true) -> String? {
+        guard let hexInt = toHexInt(includeAlpha: includeAlpha) else {
+            return nil
+        }
+        
+        if includeAlpha {
+            return String(format: "#%08X", hexInt) // 包含透明度
+        } else {
+            return String(format: "#%06X", hexInt & 0xFFFFFF) // 不包含透明度
+        }
+    }
 }
 
 

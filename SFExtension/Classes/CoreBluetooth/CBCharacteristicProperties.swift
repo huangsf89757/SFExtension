@@ -8,33 +8,32 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBCharacteristicProperties
-public extension SFWrapper where Base == CBCharacteristicProperties {
-    /// description
-    var description: String {
+// MARK: - CustomStringConvertible
+extension CBCharacteristicProperties: CustomStringConvertible {
+    public var description: String {
         var titles: [String] = []
-        if base.contains(.broadcast) {
+        if self.contains(.broadcast) {
             titles.append("Broadcast")
         }
-        if base.contains(.read) {
+        if self.contains(.read) {
             titles.append("Read")
         }
-        if base.contains(.writeWithoutResponse) {
+        if self.contains(.writeWithoutResponse) {
             titles.append("Write Without Response")
         }
-        if base.contains(.write) {
+        if self.contains(.write) {
             titles.append("Write")
         }
-        if base.contains(.notify) {
+        if self.contains(.notify) {
             titles.append("Notify")
         }
-        if base.contains(.indicate) {
+        if self.contains(.indicate) {
             titles.append("Indicate")
         }
-        if base.contains(.authenticatedSignedWrites) {
+        if self.contains(.authenticatedSignedWrites) {
             titles.append("Authenticated Signed Writes")
         }
-        if base.contains(.extendedProperties) {
+        if self.contains(.extendedProperties) {
             titles.append("Extended Properties")
         }
         return "[\(titles.joined(separator: ", "))]"

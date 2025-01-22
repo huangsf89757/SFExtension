@@ -8,11 +8,10 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBPeripheralState
-public extension SFWrapper where Base == CBPeripheralState {
-    /// description
-    var description: String {
-        switch base {
+// MARK: - CustomStringConvertible
+extension CBPeripheralState: CustomStringConvertible {
+    public var description: String {
+        switch self {
         case .disconnected:
             return "disconnected"
         case .connecting:

@@ -8,14 +8,12 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBDescriptor
-public extension SFWrapper where Base == CBDescriptor {
-    /// description
-    var description: String {
-        let address = Unmanaged.passUnretained(base).toOpaque()
-        let uuid = base.uuid
-        let value = base.value
-        return "{obj:\(address) uuid:\(uuid) value:\(String(describing: value))}"
+// MARK: - CustomStringConvertible
+extension CBDescriptor: CustomStringConvertible {
+    open override var description: String {
+        let address = Unmanaged.passUnretained(self).toOpaque()
+        let uuid = self.uuid
+        let value = self.value
+        return "[CBDescriptor]{obj:\(address) uuid:\(uuid) value:\(String(describing: value))}"
     }
 }
-

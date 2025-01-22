@@ -8,10 +8,9 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBConnectionEventMatchingOption
-public extension SFWrapper where Base == CBConnectionEventMatchingOption {
-    /// description
-    var description: String {
-        return base.rawValue
+// MARK: - CustomStringConvertible
+extension CBConnectionEventMatchingOption: CustomStringConvertible {
+    public var description: String {
+        return self.rawValue
     }
 }

@@ -8,12 +8,10 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBManagerAuthorization
-@available(iOS 13.0, *)
-public extension SFWrapper where Base == CBManagerAuthorization {
-    /// description
-    var description: String {
-        switch base {
+// MARK: - CustomStringConvertible
+extension CBManagerAuthorization: CustomStringConvertible {
+    public var description: String {
+        switch self {
         case .notDetermined:
             return "notDetermined"
         case .restricted:

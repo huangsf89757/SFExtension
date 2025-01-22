@@ -8,11 +8,10 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBConnectionEvent
-public extension SFWrapper where Base == CBConnectionEvent {
-    /// description
-    var description: String {
-        switch base {
+// MARK: - CustomStringConvertible
+extension CBConnectionEvent: CustomStringConvertible {
+    public var description: String {
+        switch self {
         case .peerDisconnected:
             return "peerDisconnected"
         case .peerConnected:
@@ -20,4 +19,3 @@ public extension SFWrapper where Base == CBConnectionEvent {
         }
     }
 }
-

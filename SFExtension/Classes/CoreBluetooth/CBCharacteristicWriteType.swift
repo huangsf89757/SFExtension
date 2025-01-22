@@ -8,11 +8,10 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBCharacteristicWriteType
-public extension SFWrapper where Base == CBCharacteristicWriteType {
-    /// name
-    var description: String {
-        switch base {
+// MARK: - CustomStringConvertible
+extension CBCharacteristicWriteType: CustomStringConvertible {
+    public var description: String {
+        switch self {
         case .withResponse:
             return "withResponse"
         case .withoutResponse:

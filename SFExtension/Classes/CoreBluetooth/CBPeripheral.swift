@@ -8,19 +8,15 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBPeripheral
-public extension SFWrapper where Base == CBPeripheral {
-    
-    
-    /// description
-    var description: String {
-        let address = Unmanaged.passUnretained(base).toOpaque()
-        let identifier = base.identifier
-        let name = base.name ?? "nil"
-        let state = base.state.sf.description
-        let rssi = base.rssi
-        return "{obj:\(address) identifier:\(identifier) name:\(name) state:\(state) rssi:\(rssi)}"
+// MARK: - CustomStringConvertible
+extension CBPeripheral: CustomStringConvertible {
+    open override var description: String {
+        let ptr = Unmanaged.passUnretained(self).toOpaque()
+        let identifier = self.identifier
+        let name = self.name ?? "nil"
+        let state = self.state.description
+        let rssi = self.rssi
+        return "[CBPeripheral]{ptr:\(ptr) identifier:\(identifier) name:\(name) state:\(state) rssi:\(rssi)}"
     }
-    
-   
 }
+

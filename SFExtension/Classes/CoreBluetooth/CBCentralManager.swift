@@ -8,21 +8,19 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBCentralManager
-public extension SFWrapper where Base == CBCentralManager {
-    /// description
-    var description: String {
-        let address = Unmanaged.passUnretained(base).toOpaque()
-        let state = base.state.sf.description
+// MARK: - CustomStringConvertible
+extension CBCentralManager: CustomStringConvertible {
+    open override var description: String {
+        let ptr = Unmanaged.passUnretained(self).toOpaque()
+        let state = self.state.description
         var authorization = "<unknown>"
         if #available(iOS 13.0, *) {
             if #available(iOS 13.1, *) {
-                authorization = CBManager.authorization.sf.description
+                authorization = CBManager.authorization.description
             } else {
-                authorization = base.authorization.sf.description
+                authorization = self.authorization.description
             }
         }
-        return "{obj:\(address) state:\(state) authorization:\(authorization) isScanning:\(base.isScanning)}"
+        return "[CBCentralManager]{ptr:\(ptr) state:\(state) authorization:\(authorization) isScanning:\(self.isScanning)}"
     }
 }
-

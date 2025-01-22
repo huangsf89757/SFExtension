@@ -8,12 +8,11 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBService
-public extension SFWrapper where Base == CBService {
-    /// description
-    var description: String {
-        let uuid = base.uuid
-        let isPrimary = base.isPrimary
-        return "{uuid:\(uuid) isPrimary:\(isPrimary)}"
+// MARK: - CustomStringConvertible
+extension CBService: CustomStringConvertible {
+    open override var description: String {
+        let uuid = self.uuid
+        let isPrimary = self.isPrimary
+        return "[CBService]{uuid:\(uuid) isPrimary:\(isPrimary)}"
     }
 }

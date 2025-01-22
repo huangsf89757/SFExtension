@@ -8,11 +8,10 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBManagerState
-public extension SFWrapper where Base == CBManagerState {
-    /// description
-    var description: String {
-        switch base {
+// MARK: - CustomStringConvertible
+extension CBManagerState: CustomStringConvertible {
+    public var description: String {
+        switch self {
         case .unknown:
             return "unknown"
         case .resetting:

@@ -8,18 +8,15 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBCharacteristic
-public extension SFWrapper where Base == CBCharacteristic {
-    /// description
-    var description: String {
-        let address = Unmanaged.passUnretained(base).toOpaque()
-        let uuid = base.uuid
-        let properties = base.properties.sf.description
-        let isBroadcasted = base.isBroadcasted
-        let isNotifying = base.isNotifying
-        let value = base.value?.sf.toHex() ?? "nil"
-        return "{obj:\(address) uuid:\(uuid) properties:\(properties) isBroadcasted:\(isBroadcasted) isNotifying:\(isNotifying) value:\(value)}"
+// MARK: - CustomStringConvertible
+extension CBCharacteristic: CustomStringConvertible {
+    open override var description: String {
+        let ptr = Unmanaged.passUnretained(self).toOpaque()
+        let uuid = self.uuid
+        let properties = self.properties.description
+        let isBroadcasted = self.isBroadcasted
+        let isNotifying = self.isNotifying
+        let value = self.value?.sf.toHex() ?? "nil"
+        return "[CBCharacteristic]{ptr:\(ptr) uuid:\(uuid) properties:\(properties) isBroadcasted:\(isBroadcasted) isNotifying:\(isNotifying) value:\(value)}"
     }
 }
-
-

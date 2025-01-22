@@ -8,11 +8,10 @@
 import Foundation
 import CoreBluetooth
 
-// MARK: - CBError
-public extension SFWrapper where Base == CBError {
-    /// description
-    var description: String {
-        switch base.code {
+// MARK: - CustomStringConvertible
+extension CBError: CustomStringConvertible {
+    public var description: String {
+        switch self.code {
         case .unknown:
             return "unknown"
         case .invalidParameters:
@@ -50,4 +49,3 @@ public extension SFWrapper where Base == CBError {
         }
     }
 }
-
